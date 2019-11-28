@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<link rel="stylesheet" type="text/css" href="stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+
+	<title>Controle de Alunos</title>
+</head>
+<body>
+	<div id="app" class="container">
+		<h1>{{title}}</h1>
+		
+		<h3 class="formulario-de-alunos">{{formulario_title}}</h3>
+		
+		<div class="container" id="formulario">
+			<form>
+				
+
+				<div class="row">
+					<div class="col-md-6">
+						<span class="bold">Matrícula<span><br>
+						<input type="text" name="matricula" id="matricula" placeholder="Matrícula">
+					</div>
+
+					<div class="col-md-6">
+						<span class="bold">Nome<span><br>
+						<input type="text" name="nome" id="nome" placeholder="Nome">
+					</div>
+				</div>
+
+				<br>
+
+				<div class="row">
+					<div class="col-md-6">
+						<span class="bold">Data de Nascimento<span><br>
+						<input type="text" name="data-de-nascimento" id="data_nascimento" placeholder="dd/mm/aaaa">
+					</div>
+
+					<div class="col-md-6">
+						<span class="bold">Email<span><br>
+						<input type="text" name="email" id="email" placeholder="Email">
+					</div>
+				</div>
+
+				<br>
+
+				<div class="row">
+					<div class="col-md-4">
+						<span class="bold">DDD<span><br>
+						<input type="text" name="ddd" id="ddd" placeholder="DDD">
+					</div>
+
+					<div class="col-md-4">
+						<span class="bold">Telefone<span><br>
+						<input type="text" name="telefone" id="telefone" placeholder="Telefone">
+					</div>
+
+					<div class="col-md-4">
+						<span class="bold">Operadora<span><br>
+						<select id="operadora">
+							<option value="oi">Oi</option>
+							<option value="vivo">Vivo</option>
+							<option value="tim">Tim</option>
+							<option value="claro">Claro</option>
+						</select>
+					</div>
+				</div>
+
+				<br>
+
+				<div class="row">
+					<div class="col-md-6">
+						<span class="bold">Campus<span><br>
+						<select id="campus">
+							<option value="pici">Pici</option>
+							<option value="benfica">Benfica</option>
+							<option value="porangabussu">Porangabussu</option>
+						</select>
+					</div>
+
+					<div class="col-md-6">
+						<span class="bold">Curso<span><br>
+						<select id="curso">
+							<option value="computacao">Computação</option>
+							<option value="matematica">Matemática</option>
+							<option value="geologia">Geologia</option>
+						</select>
+					</div>
+				</div>
+
+				<br>
+
+				<div class="row form-bottom">
+					<div>
+						<input class="form-button" type="button" name="limpar" value="Limpar" id="botao_limpar" v-on:click="botao_limpar()">
+						<input class="form-button" type="button" name="inserir" value="Inserir" id="botao_inserir" v-on:click="botao_inserir()">
+						<input class="form-button" type="button" name="alterar" value="Alterar" id="botao_alterar" v-on:click="botao_alterar()">
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br>
+		<br>
+		<br>
+
+		<div class="container">
+			<table id="tabela_alunos">
+				<tr>
+					<th>Matrícula</th>
+					<th>Nome</th>
+					<th>Ações</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+	<script>
+		var app = new Vue({
+			el: "#app",
+			data: {
+				title: "Sistema de Controle de Alunos",
+				formulario_title: "Fomulário de Alunos"
+			},
+			methods: {
+				botao_inserir() {
+					var matricula = document.getElementById("matricula").value;
+					var nome = document.getElementById("nome").value;
+					var data_nascimento = document.getElementById("data_nascimento").value;
+					var ddd = document.getElementById("ddd").value;
+					var telefone = document.getElementById("telefone").value;
+					var operadora = document.getElementById("operadora").value;
+					var campus = document.getElementById("campus").value;
+					var curso = document.getElementById("curso").value;
+					var email = document.getElementById("email").value;
+
+					if( matricula == "" || nome == "" || data_nascimento == "" || ddd == "" || telefone == "" || operadora == "" || campus == "" || curso == "" || email == "") {
+						alert("Dados Inválidos");
+						return;
+					}
+
+					if(aluno_por_matricula(matricula) != null){
+						alert("Já existe aluno com essa matricula");
+						return;	
+					}
+
+					var aluno = {
+						"matricula": matricula,
+						"nome": nome,
+						"data_nascimento": data_nascimento,
+						"ddd": ddd,
+						"telefone": telefone,
+						"operadora": operadora,
+						"campus": campus,
+						"curso": curso,
+						"id": id,
+						"email": email
+					}
+
+					alunos.push(aluno);
+					id++;
+
+					var linha = document.createElement("tr")
+					linha.id = aluno.matricula;
+
+					var matricula_td = document.createElement("td");
+					matricula_td.innerHTML = aluno.matricula;
+
+					var nome_td = document.createElement("td");
+					nome_td.innerHTML = aluno.nome;
+
+					var botao_remover = document.createElement("input");
+					botao_remover.type = "button"
+					botao_remover.value = "Remover";
+					botao_remover.onclick = function() {
+						var i;
+						for(i = 0; i < alunos.length; i++) {
+							if( alunos[i].id == aluno.id ) break;
+						}
+
+						alunos.splice(i, 1);
+
+						var tabela_alunos = document.getElementById("tabela_alunos");
+						tabela_alunos.removeChild(linha);
+					}
+					botao_remover.classList.add("botao_adicionar");
+
+					var botao_alterar = document.createElement("input");
+					botao_alterar.type = "button";
+					botao_alterar.value = "Alterar";
+					botao_alterar.onclick = function() {
+						var aluno_ = aluno_por_matricula(aluno.matricula);
+						
+						document.getElementById("matricula").value = aluno_.matricula;
+						document.getElementById("matricula").readOnly = true;
+
+						document.getElementById("nome").value = aluno_.nome;
+
+						document.getElementById("data_nascimento").value = aluno_.data_nascimento;
+
+						document.getElementById("email").value = aluno_.email;
+
+						document.getElementById("ddd").value = aluno_.ddd;
+
+						document.getElementById("telefone").value = aluno_.telefone;
+
+						document.getElementById("operadora").value = aluno_.operadora;
+						
+						document.getElementById("campus").value = aluno_.campus;
+						document.getElementById("campus").onchange();
+
+						document.getElementById("curso").value = aluno_.curso;
+
+						document.getElementById("botao_inserir").style.display = "none";
+						document.getElementById("botao_alterar").style.display = "";
+					}
+					botao_alterar.classList.add("botao_alterar")
+
+					linha.appendChild(matricula_td);
+					linha.appendChild(nome_td);
+					linha.appendChild(botao_remover);
+					linha.appendChild(botao_alterar);
+
+					var tabela_alunos = document.getElementById("tabela_alunos");
+					tabela_alunos.appendChild(linha);
+
+					limpar();
+				},
+				botao_limpar() {
+					var matricula = document.getElementById("matricula");
+					matricula.value = "";
+					matricula.readOnly = false;
+
+					var nome = document.getElementById("nome");
+					nome.value = "";
+
+					var data_nascimento = document.getElementById("data_nascimento");
+					data_nascimento.value = "";
+
+					var email = document.getElementById("email");
+					email.value = "";
+
+					var ddd = document.getElementById("ddd");
+					ddd.value = "";
+
+					var telefone = document.getElementById("telefone");
+					telefone.value = "";
+
+					document.getElementById("botao_inserir").style.display = "";
+					document.getElementById("botao_alterar").style.display = "none";
+				},
+				botao_alterar() {
+					var matricula = document.getElementById("matricula").value;
+					var nome = document.getElementById("nome").value;
+					var data_nascimento = document.getElementById("data_nascimento").value;
+					var ddd = document.getElementById("ddd").value;
+					var telefone = document.getElementById("telefone").value;
+					var operadora = document.getElementById("operadora").value;
+					var campus = document.getElementById("campus").value;
+					var curso = document.getElementById("curso").value;
+					var email = document.getElementById("email").value;
+
+					var aluno = aluno_por_matricula(matricula);
+					aluno.matricula = matricula;
+					aluno.nome = nome;
+					aluno.data_nascimento = data_nascimento;
+					aluno.ddd = ddd;
+					aluno.telefone = telefone;
+					aluno.operadora = operadora;
+					aluno.campus = campus;
+					aluno.curso = curso;
+					aluno.email = email;
+
+					var linha = document.getElementById(matricula);
+
+					linha.children[0].innerHTML = aluno.matricula;
+					linha.children[1].innerHTML = aluno.nome;
+
+					limpar();
+				}
+			}
+		});
+	</script>
+
+	<script type="text/javascript">
+		var clear_curso_select = function() {
+			var selector_field = document.getElementById("curso");
+
+			for( var i = selector_field.options.length - 1; i >= 0 ; i-- )
+				selector_field.remove(i);
+		}
+
+		var alunos = [];
+		var id = 0;
+
+		var load_function = function(evt) {
+			var campus_field = document.getElementById("campus");
+			campus_field.onchange = function(){
+				clear_curso_select();
+
+				var selector_field = document.getElementById("curso");
+
+				switch(campus_field.value){
+					case "pici": {
+						var computacao = document.createElement("option");
+						computacao.value = "computacao";
+						computacao.innerHTML = "Computação";
+						selector_field.appendChild(computacao);
+
+						var matematica = document.createElement("option");
+						matematica.value = "matematica";
+						matematica.innerHTML = "Matemática";
+						selector_field.appendChild(matematica);
+
+						var geologia = document.createElement("option");
+						geologia.value = "geologia";
+						geologia.innerHTML = "Geologia";
+						selector_field.appendChild(geologia);
+						break;
+					}
+
+					case "benfica":{
+						var letras = document.createElement("option");
+						letras.value = "letras";
+						letras.innerHTML = "Letras";
+						selector_field.appendChild(letras);
+
+						var filosofia = document.createElement("option");
+						filosofia.value = "filosofia";
+						filosofia.innerHTML = "Filosofia";
+						selector_field.appendChild(filosofia);
+
+						var direito = document.createElement("option");
+						direito.value = "direito";
+						direito.innerHTML = "Direito";
+						selector_field.appendChild(direito);
+						break;
+					}
+
+					case "porangabussu":{
+						var medicina = document.createElement("option");
+						medicina.value = "medicina";
+						medicina.innerHTML = "Medicina";
+						selector_field.appendChild(medicina);
+
+						var odontologia = document.createElement("option");
+						odontologia.value = "odontologia";
+						odontologia.innerHTML = "Odontologia";
+						selector_field.appendChild(odontologia);
+
+						var farmacia = document.createElement("option");
+						farmacia.value = "farmacia";
+						farmacia.innerHTML = "Farmácia";
+						selector_field.appendChild(farmacia);
+						break;
+					}
+				}
+			}
+		}
+
+		load_function();
+
+		function aluno_por_matricula(mat){
+			var size = alunos.length;
+
+			for(var i = 0; i < size; i++){
+				if(alunos[i].matricula == mat){
+					return alunos[i];
+				}
+			}
+
+			return null;
+		}
+
+		function limpar(){
+			var matricula = document.getElementById("matricula");
+			matricula.readOnly = false;
+			matricula.value = "";
+
+			var nome = document.getElementById("nome");
+			nome.value = "";
+
+			var data_nascimento = document.getElementById("data_nascimento");
+			data_nascimento.value = "";
+
+			var email = document.getElementById("email");
+			email.value = "";
+
+			var ddd = document.getElementById("ddd");
+			ddd.value = "";
+
+			var telefone = document.getElementById("telefone");
+			telefone.value = "";
+
+			document.getElementById("botao_inserir").style.display = "";
+			document.getElementById("botao_alterar").style.display = "none";
+		}
+
+		document.getElementById("botao_alterar").style.display = "none";
+	</script>
+</body>
+</html>

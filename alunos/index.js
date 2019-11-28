@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/api/alunos", function(req, res){
+	res.header('Access-Control-Allow-Origin', '*');
 	mongo_client.connect(url, function(err, client) {
 		if(err){
 			res.statusCode = 404;

@@ -9,6 +9,23 @@
 	<title>Controle de Alunos</title>
 </head>
 <body>
+	<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1"></div>
+			<div class="col-md-1">
+				<img id="autor" src="autor.png">
+			</div>
+	</div>
+
 	<div id="app" class="container">
 		<h1>{{title}}</h1>
 		
@@ -467,6 +484,10 @@
 		}
 
 		document.getElementById("botao_alterar").style.display = "none";
+
+		document.getElementById("autor").onclick = function(){
+			alert("Lucas Primo\nEstudante do décimo semestre de Ciência da Computação na Universidade Federal do Ceará");
+		}
 	</script>
 </body>
 </html>

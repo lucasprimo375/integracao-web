@@ -140,25 +140,58 @@
 			},
 			methods: {
 				botao_inserir() {
-					var matricula = document.getElementById("matricula").value;
+					var date_regex = /^(0?[1-9]|[12][0-9]|3[01])[\/](0?[1-9]|1[012])[\/\-]\d{4}$/;
+					var telefone_regex = /\d{4}-\d{4}/;
+					var telefone_regex_2 = /\d{5}-\d{4}/;
+
+					var matricula = parseInt(document.getElementById("matricula").value, 10);
 					var nome = document.getElementById("nome").value;
 					var data_nascimento = document.getElementById("data_nascimento").value;
-					var ddd = document.getElementById("ddd").value;
+					var ddd = parseInt(document.getElementById("ddd").value, 10);
 					var telefone = document.getElementById("telefone").value;
 					var operadora = document.getElementById("operadora").value;
 					var campus = document.getElementById("campus").value;
 					var curso = document.getElementById("curso").value;
 					var email = document.getElementById("email").value;
 
-					if( matricula == "" || nome == "" || data_nascimento == "" || ddd == "" || telefone == "" || operadora == "" || campus == "" || curso == "" || email == "") {
-						alert("Dados Inválidos");
-						return;
-					}
+					var data_not_formatted = false;
 
-					if(aluno_por_matricula(matricula) != null){
-						alert("Já existe aluno com essa matricula");
-						return;	
-					}
+					if(isNaN(matricula) || aluno_por_matricula(matricula) != null || document.getElementById("matricula").value.length != 6) {
+						document.getElementById("matricula").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("matricula").style.border =  "";
+
+					if(email == ""){
+						document.getElementById("email").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("email").style.border =  "";
+
+					if(operadora == ""){
+						document.getElementById("operadora").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("operadora").style.border =  "";
+
+					if(!telefone_regex.test(telefone) && !telefone_regex_2.test(telefone)){
+						document.getElementById("telefone").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("telefone").style.border =  "";
+
+					if(isNaN(ddd) || document.getElementById("ddd").value.length != 2){
+						document.getElementById("ddd").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("ddd").style.border =  "";
+
+					if(nome.length < 3){
+						document.getElementById("nome").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("nome").style.border =  "";
+
+					if(!date_regex.test(data_nascimento)){
+						document.getElementById("data_nascimento").style.border =  "1px solid red";
+						data_not_formatted = true;
+					} else document.getElementById("data_nascimento").style.border =  "";
+
+					if(data_not_formatted) return;
 
 					var aluno = {
 						"matricula": matricula,
@@ -197,7 +230,9 @@
 						alunos.splice(i, 1);
 
 						var tabela_alunos = document.getElementById("tabela_alunos");
-						tabela_alunos.removeChild(linha);
+
+						if(confirm("Confirma exclusão?!"))
+							tabela_alunos.removeChild(linha);
 					}
 					botao_remover.classList.add("botao_adicionar");
 
@@ -238,7 +273,20 @@
 					linha.appendChild(botao_alterar);
 
 					var tabela_alunos = document.getElementById("tabela_alunos");
-					tabela_alunos.appendChild(linha);
+
+					if(tabela_alunos.children.length == 1) tabela_alunos.appendChild(linha);
+					else {
+						var i = 1;
+						var length = tabela_alunos.children.length - 1;
+
+						while(i < length && aluno.matricula < parseInt(tabela_alunos.children[i].id))
+							i++;
+
+						if(aluno.matricula < parseInt(tabela_alunos.children[i].id))
+							tabela_alunos.insertBefore(linha, tabela_alunos.children[i].nextSibling);
+						else
+							tabela_alunos.insertBefore(linha, tabela_alunos.children[i]);
+					}
 
 					limpar();
 				},
@@ -246,21 +294,27 @@
 					var matricula = document.getElementById("matricula");
 					matricula.value = "";
 					matricula.readOnly = false;
+					matricula.style.border =  "";
 
 					var nome = document.getElementById("nome");
 					nome.value = "";
+					nome.style.border = "";
 
 					var data_nascimento = document.getElementById("data_nascimento");
 					data_nascimento.value = "";
+					data_nascimento.style.border = "";
 
 					var email = document.getElementById("email");
 					email.value = "";
+					email.style.border = "";
 
 					var ddd = document.getElementById("ddd");
 					ddd.value = "";
+					ddd.style.border = "";
 
 					var telefone = document.getElementById("telefone");
 					telefone.value = "";
+					telefone.style.border = "";
 
 					document.getElementById("botao_inserir").style.display = "";
 					document.getElementById("botao_alterar").style.display = "none";

@@ -87,16 +87,28 @@ app.post("/api/alunos", function(req, res){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				alunos.insertOne({matricula: req.body.matricula, nome: req.body.nome, curso: req.body.curso}, function(err, docs) {		  	
-				    if(err){
-				    	res.statusCode = 404;
-						res.end("Could not find documents");	
-				    } else {
-			    		res.statusCode = 200;
-			    		res.end(JSON.stringify(docs.ops[0]));
-				    }
+				alunos.insertOne({
+					matricula: req.body.matricula, 
+					nome: req.body.nome, 
+					curso: req.body.curso,
+					data_nascimento: req.body.data_nascimento,
+					ddd: req.body.ddd,
+					telefone: req.body.telefone,
+					operadora: req.body.operadora,
+					campus: req.body.campus,
+					curso: req.body.curso,
+					email: req.body.email
+					}, 
+					function(err, docs) {		  	
+					    if(err){
+					    	res.statusCode = 404;
+							res.end("Could not find documents");	
+					    } else {
+				    		res.statusCode = 200;
+				    		res.end(JSON.stringify(docs.ops[0]));
+					    }
 
-				    client.close();
+					    client.close();
 			  	});
 			}
 		}
@@ -116,7 +128,18 @@ app.put("/api/alunos/:matricula", function(req, res){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				const update = {matricula: parseInt(req.params.matricula), nome: req.body.nome, curso: req.body.curso};
+				const update = {
+					nome: req.body.nome, 
+					curso: req.body.curso,
+					data_nascimento: req.body.data_nascimento,
+					ddd: parseInt(req.body.ddd),
+					telefone: req.body.telefone,
+					operadora: req.body.operadora,
+					campus: req.body.campus,
+					curso: req.body.curso,
+					email: req.body.email
+				};
+				
 				alunos.updateOne({matricula: parseInt(req.params.matricula)}, { $set: update}, function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;
@@ -151,7 +174,18 @@ app.delete("/api/alunos/:matricula", function(req, res){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				const update = {matricula: parseInt(req.params.matricula), nome: req.body.nome, curso: req.body.curso};
+				const update = {
+					nome: req.body.nome, 
+					curso: req.body.curso,
+					data_nascimento: req.body.data_nascimento,
+					ddd: parseInt(req.body.ddd),
+					telefone: req.body.telefone,
+					operadora: req.body.operadora,
+					campus: req.body.campus,
+					curso: req.body.curso,
+					email: req.body.email
+				};
+				
 				alunos.deleteOne({matricula: parseInt(req.params.matricula)}, function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;

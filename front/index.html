@@ -164,7 +164,7 @@
 						data_not_formatted = true;
 					} else document.getElementById("matricula").style.border =  "";
 
-					if(email == ""){
+					if(!email.includes("@")){
 						document.getElementById("email").style.border =  "1px solid red";
 						data_not_formatted = true;
 					} else document.getElementById("email").style.border =  "";
@@ -291,6 +291,8 @@
 							tabela_alunos.insertBefore(linha, tabela_alunos.children[i]);
 					}
 
+					cadastrar_aluno(aluno);
+
 					limpar();
 				},
 				botao_limpar() {
@@ -349,6 +351,8 @@
 					linha.children[0].innerHTML = aluno.matricula;
 					linha.children[1].innerHTML = aluno.nome;
 
+					alterar_aluno(aluno);
+
 					limpar();
 				}
 			}
@@ -402,6 +406,8 @@
 		}
 
 		get_campi();
+
+		todos_alunos();
 	</script>
 </body>
 </html>

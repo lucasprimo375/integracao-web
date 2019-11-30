@@ -53,7 +53,7 @@ app.get("/api/alunos/:matricula", function(req, res){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				alunos.find({matricula: req.params.matricula}).toArray(function(err, docs) {		  	
+				alunos.find({matricula: parseInt(req.params.matricula)}).toArray(function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;
 						res.end("Could not find documents");	
@@ -185,7 +185,7 @@ app.delete("/api/alunos/:matricula", function(req, res){
 					curso: req.body.curso,
 					email: req.body.email
 				};
-				
+
 				alunos.deleteOne({matricula: parseInt(req.params.matricula)}, function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;
@@ -283,7 +283,7 @@ app.get("/api/campi/:codigo", function(req, res){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				campi.find({codigo: req.params.codigo}).toArray(function(err, docs) {		  	
+				campi.find({nome: req.params.codigo}).toArray(function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;
 						res.end("Could not find documents");	
@@ -304,6 +304,21 @@ app.get("/api/campi/:codigo", function(req, res){
 	});
 });
 
+function deletar_alunos(cursos, alunos, callback){
+	for(let i = 0; i < cursos.length; i++){
+		alunos.deleteMany({curso: cursos[i].nome}, function(e, d){});
+	}
+
+	callback();
+}
+
+function deletar_cursos(curso, campi){
+	curso.deleteMany({campus: campi}, function(e, d){
+		console.log(e);
+		console.log(d);
+	});
+}
+
 app.delete("/api/campi/:codigo", function(req, res){
 	mongo_client.connect(url, function(err, client) {
 		if(err){
@@ -317,7 +332,7 @@ app.delete("/api/campi/:codigo", function(req, res){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				campi.deleteOne({codigo: parseInt(req.params.codigo)}, function(err, docs) {		  	
+				campi.deleteOne({nome: req.params.codigo}, function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;
 						res.end("Could not find documents");	
@@ -327,8 +342,88 @@ app.delete("/api/campi/:codigo", function(req, res){
 				    		res.end("Nenhum campus foi deletado");
 				    	} else {
 				    		res.statusCode = 200;
+
+				    		const curso = db.collection("curso");
+				    		let alunos = db.collection("alunos")
+				    		curso.find({campus: req.params.codigo}).toArray(function(err, doc){
+				    			deletar_alunos(doc, alunos, function(){
+				    				deletar_cursos(curso, req.params.codigo);
+				    			});
+				    		});
+
 			    			res.end(JSON.stringify(docs));
 				    	}
+				    }
+
+				    
+			  	});
+			}
+		}
+	});
+});
+
+app.put("/api/campi/:codigo", function(req, res){
+	mongo_client.connect(url, function(err, client) {
+		if(err){
+			res.statusCode = 404;
+			res.end("Could not connect to server");
+		} else {
+			const db = client.db("test");
+			const campi = db.collection("campi");
+
+			if(!db || !campi){
+				res.statusCode = 404;
+				res.end("Could not connect to database or to documents");
+			} else {
+				const update = {
+					nome: req.body.nome
+				};
+				
+				campi.updateOne({nome: req.params.codigo}, { $set: update}, function(err, docs) {		  	
+				    if(err){
+				    	res.statusCode = 404;
+						res.end("Could not find documents");	
+				    } else {
+				    	if(docs.modifiedCount == 0){
+				    		res.statusCode = 404;
+				    		res.end("Nenhum campi foi modificado");
+				    	} else {
+				    		res.statusCode = 200;
+
+				    		const curso = db.collection("curso");
+				    		curso.updateMany({campus: req.params.codigo}, {$set: {campus: req.body.nome}}, function(err, docs){
+				    			res.end(JSON.stringify(update));
+				    		});
+				    	}
+				    }
+
+				    client.close();
+			  	});
+			}
+		}
+	});
+});
+
+app.post("/api/campi", function(req, res){
+	mongo_client.connect(url, function(err, client) {
+		if(err){
+			res.statusCode = 404;
+			res.end("Could not connect to server");
+		} else {
+			const db = client.db("test");
+			const campi = db.collection("campi");
+
+			if(!db || !campi){
+				res.statusCode = 404;
+				res.end("Could not connect to database or to documents");
+			} else {
+				campi.insertOne({ nome: req.body.nome}, function(err, docs) {		  	
+				    if(err){
+				    	res.statusCode = 404;
+						res.end("Could not find documents");	
+				    } else {
+			    		res.statusCode = 200;
+			    		res.end(JSON.stringify(docs.ops[0]));
 				    }
 
 				    client.close();

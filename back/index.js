@@ -1,5 +1,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
+var cors = require("cors");
 var mongo_client = require("mongodb").MongoClient;
 
 const url = "mongodb://localhost:27017";
@@ -8,9 +9,9 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
 app.get("/api/alunos", function(req, res){
-	res.header('Access-Control-Allow-Origin', '*');
 	mongo_client.connect(url, function(err, client) {
 		if(err){
 			res.statusCode = 404;
@@ -172,6 +173,39 @@ app.delete("/api/alunos/:matricula", function(req, res){
 	});
 });
 
+function campus_existe(campi, nome){
+	for(var i = 0; i < campi.length; i++){
+		if(campi[i].nome == nome) return true;
+	}
+
+	return false;
+}
+
+function contabilizar_curso(campi, curso){
+	for(var i = 0; i < campi.length; i++){
+		if(campi[i].nome == curso.campus){
+			campi[i].cursos.push(curso.nome);
+		}
+	}
+}
+
+function formatar_campi(cursos, callback){
+	var campi = [];
+
+	for(var i = 0; i < cursos.length; i++){
+		if(!campus_existe(campi, cursos[i].campus)){
+			campi.push({
+				nome: cursos[i].campus,
+				cursos: [cursos[i].nome]
+			})
+		} else {
+			contabilizar_curso(campi, cursos[i]);
+		}
+	}
+
+	callback(campi);
+}
+
 app.get("/api/campi", function(req, res){
 	mongo_client.connect(url, function(err, client) {
 		if(err){
@@ -179,22 +213,23 @@ app.get("/api/campi", function(req, res){
 			res.end("Could not connect to server");
 		} else {
 			const db = client.db("test");
-			const campi = db.collection("campi");
+			const cursos = db.collection("curso");
 
-			if(!db || !campi){
+			if(!db || !cursos){
 				res.statusCode = 404;
 				res.end("Could not connect to database or to documents");
 			} else {
-				campi.find({}).toArray(function(err, docs) {		  	
+				cursos.find({}).toArray(function(err, docs) {		  	
 				    if(err){
 				    	res.statusCode = 404;
 						res.end("Could not find documents");	
 				    } else {
-				    	res.statusCode = 200;
-				    	res.end(JSON.stringify(docs));
+				    	formatar_campi(docs, function(campi){
+				    		res.statusCode = 200;
+				    		res.end(JSON.stringify(campi));
+				    		client.close();
+				    	});
 				    }
-
-				    client.close();
 			  	});
 			}
 		}

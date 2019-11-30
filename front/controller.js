@@ -86,13 +86,13 @@ function todos_alunos(){
 			var alunos_ = res.data;
 
 			for(var i = 0; i < alunos_.length; i++){
-				var aluno = alunos_[i];
+				let aluno = alunos_[i];
 
 				alunos.push(aluno);
 				aluno.id = id;
 				id++;
 
-				var linha = document.createElement("tr")
+				let linha = document.createElement("tr")
 				linha.id = aluno.matricula;
 
 				var matricula_td = document.createElement("td");
@@ -104,20 +104,24 @@ function todos_alunos(){
 				var botao_remover = document.createElement("input");
 				botao_remover.type = "button"
 				botao_remover.value = "Remover";
+				let aluno_id = aluno.id;
+				let mat = aluno.matricula;
 				botao_remover.onclick = function() {
 					for(var j = 0; j < alunos.length; j++) {
-						if( alunos[j].id == aluno.id ) break;
+						if( alunos[j].id == aluno_id ) break;
 					}
 
 					alunos.splice(j, 1);
+					console.log("");
 
 					var tabela_alunos = document.getElementById("tabela_alunos");
 
 					if(confirm("Confirma exclusão?!")){
+						console.log(linha);
 						tabela_alunos.removeChild(linha);
 
 						axios
-							.delete("http://localhost:3000/api/alunos/" + aluno.matricula, aluno)
+							.delete("http://localhost:3000/api/alunos/" + mat, aluno)
 							.then(res => {
 								console.log(res);
 							})
@@ -131,7 +135,6 @@ function todos_alunos(){
 				var botao_alterar = document.createElement("input");
 				botao_alterar.type = "button";
 				botao_alterar.value = "Alterar";
-				let mat = aluno.matricula;
 				botao_alterar.onclick = function() {
 					var aluno_ = aluno_por_matricula(mat);
 					

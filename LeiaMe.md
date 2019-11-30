@@ -15,3 +15,5 @@ Na rota <server>/api/campi (método POST), o corpo da mensagem é {nome: <nome_d
 Na rota <server>/api/campi/:codigo (método PUT), o código é o nome do campus e o corpo da mensagem é o novo nome do campus.
 
 A mesma lógica foi feita para as rotas restantes de /api/campi.
+
+Para entrar no site, abrir no navegador o arquivo index.html na pasta front.

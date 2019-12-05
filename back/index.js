@@ -422,8 +422,16 @@ app.post("/api/campi", function(req, res){
 				    	res.statusCode = 404;
 						res.end("Could not find documents");	
 				    } else {
-			    		res.statusCode = 200;
-			    		res.end(JSON.stringify(docs.ops[0]));
+				    	const curso = db.collection("curso");
+
+				    	for(let i = 0; i < req.body.cursos.length; i++){
+				    		curso.insertOne({nome: req.body.cursos[i], campus: req.body.nome}, function(err, x){});
+
+				    		if( i == req.body.cursos.length - 1 ){
+				    			res.statusCode = 200;
+			    				res.end(JSON.stringify(docs.ops[0]));
+				    		}
+				    	}
 				    }
 
 				    client.close();
